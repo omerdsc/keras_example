@@ -102,9 +102,46 @@ model.compile(optimizer=RMSprop(learning_rate=0.0001,decay=1e-6),# learning_rate
 
 #model training
 
-model.fit(datagen.flow(x_train,_train,batch_size=64),
-          epochs=50, #eğitim dönen sayisi
+history=model.fit(datagen.flow(x_train,y_train,batch_size=250),
+          epochs=10, #eğitim dönen sayisi
           validation_data=(x_test,y_test) #doğrulama seti
           ) 
 
 #%% Test model and evaluate performance
+
+#modelin test veri seti üzerinden tahminini yap
+
+y_pred=model.predict(x_test) #y_pred=[0,1] mesela 0.8 cikarsa %0 olma olasılığı olarak tariflendirir
+np.argmax(y_pred,axis=1) #◘tahmin edilen sınıfları almak için
+
+y_pred=model.predict(x_test) # y_pred=[0,1] mesela 0.8 olma olasılığı %80 olarak tarif edilir
+y_pred_class=np.argmax(y_pred,axis=1) # tahmin edilen sınıfları al
+y_true=np.argmax(y_test,axis=1)
+
+#clasification report hesapla
+
+report=classification_report(y_true, y_pred_class,target_names=class_labels)
+print(report)
+
+plt.figure(figsize=(10,8))
+#kayip grafikleri
+plt.subplot(1,2,1) #1 satır 2 sütün 1. subplot
+plt.plot(history.history["loss"],label="Train loss")
+plt.plot(history.history["val_loss"],label="validation loss")
+plt.xlabel("Epochs")
+plt.ylabel("Loss")
+plt.title("Train and Validation loss")
+plt.legend()
+plt.grid()
+
+#accuracy
+plt.subplot(1,2,2) #1 satır 2 sütün 1. subplot
+plt.plot(history.history["accuracy"],label="Train accuacy")
+plt.plot(history.history["val_accuracy"],label="validation accuracy")
+plt.xlabel("Epochs")
+plt.ylabel("Accuracy")
+plt.title("Train and Validation accuracy")
+plt.legend()
+plt.grid()
+plt.tight_layout()
+plt.show()
